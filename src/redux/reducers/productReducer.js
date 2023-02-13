@@ -12,7 +12,8 @@ const productReducer = (state = initialState, action) => {
             };
         case actionTypes.REMOVE_FROM_CART:
             return {
-
+                ...state,
+                cart: state.cart.filter(product => product.model !== action.payload.model)
             };
 
         default:

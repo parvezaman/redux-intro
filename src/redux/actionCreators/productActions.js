@@ -6,3 +6,9 @@ export const handleAddToCart = (product) => {
         payload: product
     }
 }
+export const handleRemoveFromCart = (product) => {
+    return {
+        type: actionTypes.REMOVE_FROM_CART,
+        payload: product
+    }
+}
