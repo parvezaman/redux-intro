@@ -1,41 +1,78 @@
-import { actionTypes } from "../actionTypes/actionTypes";
+import {
+    ADD_PRODUCT,
+    ADD_TO_CART,
+    PRODUCT_LOADED,
+    REMOVE_FROM_CART,
+    REMOVE_PRODUCT,
+} from "../actionTypes/actionTypes";
 
 const initialState = {
-    cart: []
+    cart: [],
+    products: [],
 };
 
 const productReducer = (state = initialState, action) => {
-    const selectedProduct = state.cart.find(product => product.model === action.payload.model)
-    console.log(selectedProduct);
+    const selectedProduct = state.cart.find(
+        (product) => product._id === action.payload._id
+    );
+
     switch (action.type) {
-        case actionTypes.ADD_TO_CART:
+        case ADD_PRODUCT:
+            return {
+                ...state,
+                products: [...state.products, action.payload],
+            };
+        case REMOVE_PRODUCT:
+            return {
+                ...state,
+                products: state.products.filter(
+                    (product) => product._id !== action.payload
+                ),
+            };
+        case ADD_TO_CART:
             if (selectedProduct) {
-                const cartWithoutNewItem = state.cart.filter(product => product.model !== action.payload.model)
-                selectedProduct.quantity++;
+                const newCart = state.cart.filter(
+                    (product) => product._id !== selectedProduct._id
+                );
+
+                selectedProduct.quantity = selectedProduct.quantity + 1;
+
                 return {
-                    ...state, cart: [...cartWithoutNewItem, selectedProduct]
+                    ...state,
+                    cart: [...newCart, selectedProduct],
                 };
             }
             return {
                 ...state,
-                cart: [...state.cart, { ...action.payload, quantity: 1 }]
+                cart: [...state.cart, { ...action.payload, quantity: 1 }],
             };
-        case actionTypes.REMOVE_FROM_CART:
-            if (selectedProduct && selectedProduct.quantity > 1) {
-                const cartWithoutSelectedItem = state.cart.filter(product => product.model !== action.payload.model)
-                selectedProduct.quantity--
+        case REMOVE_FROM_CART:
+            if (selectedProduct.quantity > 1) {
+                const newCart = state.cart.filter(
+                    (product) => product._id !== selectedProduct._id
+                );
+                selectedProduct.quantity = selectedProduct.quantity - 1;
+
                 return {
-                    ...state, cart: [selectedProduct, ...cartWithoutSelectedItem]
-                }
+                    ...state,
+                    cart: [...newCart, selectedProduct],
+                };
             }
             return {
                 ...state,
-                cart: state.cart.filter(product => product.model !== action.payload.model)
+                cart: state.cart.filter(
+                    (product) => product._id !== action.payload._id
+                ),
             };
 
+        case PRODUCT_LOADED:
+            return {
+                ...state,
+                products: action.payload,
+            };
         default:
             return state;
     }
-}
+};
 
 export default productReducer;
